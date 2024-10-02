@@ -1,5 +1,5 @@
 const typeDefs = `#graphql
-  type Books {
+  type Book {
     title: String!
     published: Int!
     author: String!
@@ -7,7 +7,7 @@ const typeDefs = `#graphql
     genres: [String!]!
   }
 
-  type Authors {
+  type Author {
     name: String!
     id: String!
     born: Int
@@ -16,10 +16,14 @@ const typeDefs = `#graphql
 
   type Query {
     bookCount: Int
-    allBooks(author: String, genre: String): [Books!]!
+    allBooks(author: String, genre: String): [Book!]!
 
     authorCount: Int
-    allAuthors: [Authors!]!
+    allAuthors: [Author!]!
+  }
+
+  type Mutation {
+    addBook(title: String!, author: String!, published: Int!, genres: [String!]!): Book
   }
 `;
 
