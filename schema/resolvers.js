@@ -17,6 +17,8 @@ function calculateBookCount(authors, books) {
   });
 }
 
+authors = calculateBookCount(authors, books);
+
 const resolvers = {
   Query: {
     bookCount: () => books.length,
@@ -35,7 +37,7 @@ const resolvers = {
     },
 
     authorCount: () => authors.length,
-    allAuthors: () => calculateBookCount(authors, books),
+    allAuthors: () => authors,
   },
 
   Mutation: {
@@ -43,7 +45,23 @@ const resolvers = {
       const newBook = { ...args, id: uuid() };
       books.push(newBook);
       if (!authors.find((a) => a.name == newBook.author)) authors.push({ name: newBook.author, id: uuid() });
+      authors = calculateBookCount(authors, books);
       return newBook;
+    },
+
+    editAuthor: (_parent, args) => {
+      let changedAuthor;
+
+      authors = authors.map((a) => {
+        if (a.name == args.name) {
+          changedAuthor = { ...a, born: args.setBornTo };
+          return changedAuthor;
+        } else {
+          return a;
+        }
+      });
+
+      return changedAuthor;
     },
   },
 };
