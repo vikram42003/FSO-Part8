@@ -6,6 +6,7 @@ let authors = import_authors;
 const resolvers = {
   Query: {
     bookCount: () => books.length,
+    allBooks: () => books,
     authorCount: () => authors.length,
   },
 };
