@@ -6,10 +6,20 @@ const typeDefs = `#graphql
     id: String!
     genres: [String!]!
   }
+
+  type Authors {
+    name: String!
+    id: String!
+    born: Int
+    bookCount: Int!
+  }
+
   type Query {
     bookCount: Int
-    authorCount: Int
     allBooks: [Books!]!
+
+    authorCount: Int
+    allAuthors: [Authors!]!
   }
 `;
 
