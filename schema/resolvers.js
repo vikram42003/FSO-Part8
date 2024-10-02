@@ -22,11 +22,17 @@ const resolvers = {
   Query: {
     bookCount: () => books.length,
     allBooks: (_parent, args) => {
+      let booksToReturn = books;
+
       if (args.author) {
-        return books.filter((b) => b.author.includes(args.author));
+        booksToReturn = booksToReturn.filter((b) => b.author.includes(args.author));
       }
 
-      return books;
+      if (args.genre) {
+        booksToReturn = booksToReturn.filter((b) => b.genres.some((genre) => genre.includes(args.genre)));
+      }
+
+      return booksToReturn;
     },
 
     authorCount: () => authors.length,
