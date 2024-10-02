@@ -21,7 +21,13 @@ authors = calculateBookCount(authors, books);
 const resolvers = {
   Query: {
     bookCount: () => books.length,
-    allBooks: () => books,
+    allBooks: (_parent, args) => {
+      if (args.author) {
+        return books.filter((b) => b.author.includes(args.author));
+      }
+
+      return books;
+    },
 
     authorCount: () => authors.length,
     allAuthors: () => authors,
