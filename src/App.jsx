@@ -1,8 +1,8 @@
 import { Routes, Route, NavLink, Navigate } from "react-router-dom";
 
-import Authors from "./components/Authors";
-import Books from "./components/Books";
-import NewBook from "./components/NewBook";
+import Authors from "./views/Authors";
+import Books from "./views/Books";
+import NewBook from "./views/NewBook";
 
 const App = () => {
   const navStyle = {

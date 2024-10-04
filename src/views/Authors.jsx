@@ -1,6 +1,7 @@
 import { useQuery } from "@apollo/client";
 
 import { getAllAuthors } from "../graphql/queries";
+import BirthYearForm from "../components/BirthYearForm";
 
 const Authors = () => {
   const { loading, error, data } = useQuery(getAllAuthors);
@@ -30,6 +31,8 @@ const Authors = () => {
           ))}
         </tbody>
       </table>
+
+      <BirthYearForm />
     </div>
   );
 };
