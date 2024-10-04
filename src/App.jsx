@@ -1,24 +1,39 @@
-import { useState } from "react";
+import { Routes, Route, NavLink, Navigate } from "react-router-dom";
+
 import Authors from "./components/Authors";
 import Books from "./components/Books";
 import NewBook from "./components/NewBook";
 
 const App = () => {
-  const [page, setPage] = useState("authors");
+  const navStyle = {
+    display: "flex",
+    backgroundColor: "lightGray",
+    margin: "1rem 0 3rem",
+  };
+  const navLinkStyle = {
+    padding: "0.75rem 0.5rem",
+  };
 
   return (
     <div>
-      <div>
-        <button onClick={() => setPage("authors")}>authors</button>
-        <button onClick={() => setPage("books")}>books</button>
-        <button onClick={() => setPage("add")}>add book</button>
-      </div>
+      <nav style={navStyle}>
+        <NavLink style={navLinkStyle} to={"/authors"}>
+          authors
+        </NavLink>
+        <NavLink style={navLinkStyle} to={"/books"}>
+          books
+        </NavLink>
+        <NavLink style={navLinkStyle} to={"/add"}>
+          add
+        </NavLink>
+      </nav>
 
-      <Authors show={page === "authors"} />
-
-      <Books show={page === "books"} />
-
-      <NewBook show={page === "add"} />
+      <Routes>
+        <Route path="/" element={<Navigate to="/authors" />} />
+        <Route path="/authors" element={<Authors />} />
+        <Route path="/books" element={<Books />} />
+        <Route path="/add" element={<NewBook />} />
+      </Routes>
     </div>
   );
 };
