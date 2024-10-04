@@ -32,7 +32,7 @@ const Authors = () => {
         </tbody>
       </table>
 
-      <BirthYearForm />
+      <BirthYearForm authorNames={authors.map((a) => a.name)} />
     </div>
   );
 };
