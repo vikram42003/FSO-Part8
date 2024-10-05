@@ -1,8 +1,18 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
+import mongoose from "mongoose";
 
-import typeDefs from "./schema/typeDefs.js";
-import resolvers from "./schema/resolvers.js";
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log("Connected to MongoDB");
+  })
+  .catch((error) => {
+    console.log("Could not connect to MongoDB\n", error);
+  });
+
+import typeDefs from "./graphql/typeDefs.js";
+import resolvers from "./graphql/resolvers.js";
 
 const server = new ApolloServer({
   typeDefs,
