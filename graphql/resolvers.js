@@ -51,19 +51,17 @@ const resolvers = {
       }
     },
 
-    editAuthor: (_parent, args) => {
-      let changedAuthor;
-
-      authors = authors.map((a) => {
-        if (a.name == args.name) {
-          changedAuthor = { ...a, born: args.setBornTo };
-          return changedAuthor;
-        } else {
-          return a;
+    editAuthor: async (_parent, args) => {
+      if (args.setBornTo) {
+        try {
+          const author = await Author.findOne({ name: args.name });
+          author.born = args.setBornTo;
+          await author.save();
+          return author;
+        } catch (error) {
+          console.log("Error occured while editing author\n", error);
         }
-      });
-
-      return changedAuthor;
+      }
     },
   },
 };
