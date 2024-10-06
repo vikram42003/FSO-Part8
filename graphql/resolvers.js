@@ -13,9 +13,9 @@ const resolvers = {
           filter.author = author._id;
         }
       }
-      // TODO - fix the genre matching
       if (args.genre) {
-        filter.genres = args.genre;
+        console.log(args.genre);
+        filter.genres = { $all: args.genre };
       }
 
       return await Book.find(filter).populate("author");
