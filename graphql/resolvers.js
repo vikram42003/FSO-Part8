@@ -1,5 +1,7 @@
 import Book from "../models/bookSchema.js";
 import Author from "../models/authorSchema.js";
+import { GraphQLError } from "graphql";
+import mongoose from "mongoose";
 
 const resolvers = {
   Query: {
@@ -36,6 +38,14 @@ const resolvers = {
           savedAuthor = await newAuthor.save();
         } catch (error) {
           console.log("Error occured while saving a new author\n", error);
+          if (error instanceof mongoose.Error.ValidationError) {
+            throw new GraphQLError(error.errors.name.message, {
+              extensions: {
+                code: "GRAPHQL_VALIDATION_FAILED",
+                invalidArgs: error.errors.name.path,
+              },
+            });
+          }
         }
       }
 
@@ -47,7 +57,23 @@ const resolvers = {
 
         return await savedBook.populate("author");
       } catch (error) {
-        console.log("Error occured while saving a new book\n", error);
+        console.log("Error occured while saving a new book\n\n\n", error);
+
+        if (error.code === 11000) {
+          throw new GraphQLError("Book with the same title already exists on the server", {
+            extensions: {
+              code: "BAD_USER_INPUT",
+              invalidArgs: args.title,
+            },
+          });
+        } else if (error instanceof mongoose.Error.ValidationError) {
+          throw new GraphQLError(error.errors.title.message, {
+            extensions: {
+              code: "GRAPHQL_VALIDATION_FAILED",
+              invalidArgs: error.errors.title.path,
+            },
+          });
+        }
       }
     },
 
@@ -55,11 +81,24 @@ const resolvers = {
       if (args.setBornTo) {
         try {
           const author = await Author.findOne({ name: args.name });
+
+          if (!author) {
+            throw new GraphQLError("Author not found on the server", {
+              extensions: {
+                code: "NOT_FOUND",
+                invalidArgs: args.name,
+              },
+            });
+          }
+
           author.born = args.setBornTo;
           await author.save();
           return author;
         } catch (error) {
           console.log("Error occured while editing author\n", error);
+          if (error instanceof GraphQLError) {
+            throw error;
+          }
         }
       }
     },
