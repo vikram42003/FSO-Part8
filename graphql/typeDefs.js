@@ -11,6 +11,7 @@ const typeDefs = `#graphql
     name: String!
     id: String!
     born: Int
+    books: [Book!]!
     bookCount: Int!
   }
 
