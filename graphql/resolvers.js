@@ -5,38 +5,45 @@ const resolvers = {
   Query: {
     bookCount: async () => await Book.countDocuments(),
     allBooks: async (_parent, args) => {
-      const author = await Author.find({ name: args.author });
-      return await Book.find({ author: author._id, genres: args.genre }).populate();
+      const filter = {};
+
+      if (args.author) {
+        const author = await Author.findOne({ name: args.author });
+        if (author) {
+          filter.author = author._id;
+        }
+      }
+      if (args.genre) {
+        filter.genres = args.genre;
+      }
+      
+      return await Book.find(filter).populate();
     },
 
     authorCount: async () => await Author.countDocuments(),
-    allAuthors: async () => await Author.find({}),
+    allAuthors: async () => await Author.find({}).populate(),
   },
 
-  // Mutation: {
-  //   addBook: (_parent, args) => {
-  //     const newBook = { ...args, id: uuid() };
-  //     books.push(newBook);
-  //     if (!authors.find((a) => a.name == newBook.author)) authors.push({ name: newBook.author, id: uuid() });
-  //     authors = calculateBookCount(authors, books);
-  //     return newBook;
-  //   },
+  Mutation: {
+    addBook: (_parent, args) => {
+      const newBook = new Book({ ...args });
+    },
 
-  //   editAuthor: (_parent, args) => {
-  //     let changedAuthor;
+    editAuthor: (_parent, args) => {
+      let changedAuthor;
 
-  //     authors = authors.map((a) => {
-  //       if (a.name == args.name) {
-  //         changedAuthor = { ...a, born: args.setBornTo };
-  //         return changedAuthor;
-  //       } else {
-  //         return a;
-  //       }
-  //     });
+      authors = authors.map((a) => {
+        if (a.name == args.name) {
+          changedAuthor = { ...a, born: args.setBornTo };
+          return changedAuthor;
+        } else {
+          return a;
+        }
+      });
 
-  //     return changedAuthor;
-  //   },
-  // },
+      return changedAuthor;
+    },
+  },
 };
 
 export default resolvers;

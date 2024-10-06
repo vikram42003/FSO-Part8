@@ -1,16 +1,36 @@
 import { Schema, model } from "mongoose";
 
-const schema = new Schema({
-  name: {
-    type: String,
-    required: true,
-    unique: true,
-    minlength: 4,
+const schema = new Schema(
+  // make changes to integrate this or something
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+      minlength: 4,
+    },
+    born: {
+      type: Number,
+    },
+    books: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Book",
+      },
+    ],
   },
-  born: {
-    type: Number,
-  },
-});
+  {
+    virtuals: {
+      bookCount: {
+        get() {
+          return this.books.length;
+        },
+      },
+    },
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
+);
 
 const Author = model("Author", schema);
 
