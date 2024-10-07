@@ -8,6 +8,10 @@ import User from "../models/userSchema.js";
 
 const resolvers = {
   Query: {
+    me: (_parent, args, context) => {
+      return context.currentUser;
+    },
+
     bookCount: async () => await Book.countDocuments(),
     allBooks: async (_parent, args) => {
       const filter = {};
@@ -70,7 +74,15 @@ const resolvers = {
       return { value: jwt.sign({ username: user.username, id: user.id }, process.env.JWT_SECRET) };
     },
 
-    addBook: async (_parent, args) => {
+    addBook: async (_parent, args, context) => {
+      if (!context.currentUser) {
+        throw new GraphQLError("This operation can only be performed by a logged in user", {
+          extensions: {
+            code: "NOT_AUTHORIZED",
+          },
+        });
+      }
+
       let savedAuthor = await Author.findOne({ name: args.author });
 
       // Create an Author if they're not in the database
@@ -122,7 +134,14 @@ const resolvers = {
       }
     },
 
-    editAuthor: async (_parent, args) => {
+    editAuthor: async (_parent, args, context) => {
+      if (!context.currentUser) {
+        throw new GraphQLError("This operation can only be performed by a logged in user", {
+          extensions: {
+            code: "NOT_AUTHORIZED",
+          },
+        });
+      }
       if (args.setBornTo) {
         try {
           const author = await Author.findOne({ name: args.name });
