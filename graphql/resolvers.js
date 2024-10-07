@@ -1,7 +1,10 @@
-import Book from "../models/bookSchema.js";
-import Author from "../models/authorSchema.js";
 import { GraphQLError } from "graphql";
 import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
+
+import Book from "../models/bookSchema.js";
+import Author from "../models/authorSchema.js";
+import User from "../models/userSchema.js";
 
 const resolvers = {
   Query: {
@@ -28,6 +31,45 @@ const resolvers = {
   },
 
   Mutation: {
+    createUser: async (_parent, args) => {
+      const newUser = new User({ ...args });
+      try {
+        const savedUser = await newUser.save();
+        return savedUser;
+      } catch (error) {
+        if (error instanceof mongoose.Error.ValidationError) {
+          throw new GraphQLError("The username should be at least 4 or more charactors long", {
+            extensions: {
+              code: "GRAPHQL_VALIDATION_FAILED",
+              invalidArgs: args.username,
+              error,
+            },
+          });
+        } else if (error.code === 11000) {
+          throw new GraphQLError("User with the same title already exists on the server", {
+            extensions: {
+              code: "BAD_USER_INPUT",
+              invalidArgs: args.title,
+              error,
+            },
+          });
+        }
+      }
+    },
+    login: async (_parent, args) => {
+      const user = await User.findOne({ username: args.username });
+
+      if (!user || args.password !== "secret") {
+        throw new GraphQLError("Invalid credentials", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+          },
+        });
+      }
+
+      return { value: jwt.sign({ username: user.username, id: user.id }, process.env.JWT_SECRET) };
+    },
+
     addBook: async (_parent, args) => {
       let savedAuthor = await Author.findOne({ name: args.author });
 
@@ -43,6 +85,7 @@ const resolvers = {
               extensions: {
                 code: "GRAPHQL_VALIDATION_FAILED",
                 invalidArgs: error.errors.name.path,
+                error,
               },
             });
           }
@@ -64,6 +107,7 @@ const resolvers = {
             extensions: {
               code: "BAD_USER_INPUT",
               invalidArgs: args.title,
+              error,
             },
           });
         } else if (error instanceof mongoose.Error.ValidationError) {
@@ -71,6 +115,7 @@ const resolvers = {
             extensions: {
               code: "GRAPHQL_VALIDATION_FAILED",
               invalidArgs: error.errors.title.path,
+              error,
             },
           });
         }
@@ -82,6 +127,7 @@ const resolvers = {
         try {
           const author = await Author.findOne({ name: args.name });
 
+          // move this error to catch block maybe
           if (!author) {
             throw new GraphQLError("Author not found on the server", {
               extensions: {
