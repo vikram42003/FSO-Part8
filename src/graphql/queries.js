@@ -27,3 +27,13 @@ export const getAllBooks = gql`
     }
   }
 `;
+
+export const me = gql`
+  query Me {
+    me {
+      username
+      favoriteGenre
+      id
+    }
+  }
+`;

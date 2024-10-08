@@ -2,7 +2,7 @@ import { useQuery } from "@apollo/client";
 import { getAllBooks } from "../graphql/queries";
 import { useState } from "react";
 
-const Books = () => {
+const Books = ({ favoriteGenre }) => {
   const [genre, setGenre] = useState("all");
   const { loading, error, data } = useQuery(getAllBooks);
 
@@ -16,19 +16,31 @@ const Books = () => {
   };
 
   const books = data.allBooks;
-  const genreSet = new Set();
-  books.forEach((book) => book.genres.forEach((g) => genreSet.add(g)));
-  const genreList = [...genreSet];
 
-  const filteredBooks = genre === "all" ? books : books.filter((book) => book.genres.includes(genre));
+  let genreList;
+  let filteredBooks;
+  if (favoriteGenre) {
+    filteredBooks = books.filter((book) => book.genres.includes(favoriteGenre));
+  } else {
+    const genreSet = new Set();
+    books.forEach((book) => book.genres.forEach((g) => genreSet.add(g)));
+    genreList = [...genreSet];
+    filteredBooks = genre === "all" ? books : books.filter((book) => book.genres.includes(genre));
+  }
 
   return (
     <div>
       <h2>books</h2>
 
-      <p>
-        selected genre - <b>{genre}</b>
-      </p>
+      {favoriteGenre ? (
+        <p>
+          Books in your favourite genre - <b>{favoriteGenre}</b>
+        </p>
+      ) : (
+        <p>
+          selected genre - <b>{genre}</b>
+        </p>
+      )}
 
       <table style={tableStyle}>
         <tbody>
@@ -47,16 +59,23 @@ const Books = () => {
         </tbody>
       </table>
 
-      <div>
-        <button type="button" onClick={() => setGenre("all")} style={genre === "all" ? { borderColor: "blue" } : {}}>
-          All
-        </button>
-        {genreList.map((g) => (
-          <button key={g} type="button" onClick={() => setGenre(g)} style={genre === g ? { borderColor: "blue" } : {}}>
-            {g}
+      {!favoriteGenre && (
+        <div>
+          <button type="button" onClick={() => setGenre("all")} style={genre === "all" ? { borderColor: "blue" } : {}}>
+            All
           </button>
-        ))}
-      </div>
+          {genreList.map((g) => (
+            <button
+              key={g}
+              type="button"
+              onClick={() => setGenre(g)}
+              style={genre === g ? { borderColor: "blue" } : {}}
+            >
+              {g}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,11 +1,12 @@
 import { Routes, Route, NavLink, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useApolloClient } from "@apollo/client";
 
 import Authors from "./views/Authors";
 import Books from "./views/Books";
 import NewBook from "./views/NewBook";
 import Login from "./views/Login";
-import { useEffect, useState } from "react";
-import { useApolloClient } from "@apollo/client";
+import Recommended from "./views/Recommended";
 
 const App = () => {
   const [token, setToken] = useState(null);
@@ -31,7 +32,7 @@ const App = () => {
     border: "none",
     textDecoration: "underline",
     color: "darkBlue",
-    cursor: "pointer"
+    cursor: "pointer",
   };
 
   const handleLogout = () => {
@@ -54,6 +55,11 @@ const App = () => {
             add book
           </NavLink>
         )}
+        {token && (
+          <NavLink style={navLinkStyle} to={"/recommended"}>
+            recommended
+          </NavLink>
+        )}
         {!token && (
           <NavLink style={navLinkStyle} to={"/login"}>
             login
@@ -71,6 +77,7 @@ const App = () => {
         <Route path="/authors" element={<Authors token={token} />} />
         <Route path="/books" element={<Books />} />
         <Route path="/addBook" element={<NewBook />} />
+        <Route path="/recommended" element={<Recommended />} />
         <Route path="/login" element={<Login setToken={setToken} />} />
       </Routes>
     </div>
