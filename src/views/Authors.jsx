@@ -3,7 +3,7 @@ import { useQuery } from "@apollo/client";
 import { getAllAuthors } from "../graphql/queries";
 import BirthYearForm from "../components/BirthYearForm";
 
-const Authors = () => {
+const Authors = ({ token }) => {
   const { loading, error, data } = useQuery(getAllAuthors);
 
   if (loading) return <div>Loading author data...</div>;
@@ -32,7 +32,7 @@ const Authors = () => {
         </tbody>
       </table>
 
-      <BirthYearForm authorNames={authors.map((a) => a.name)} />
+      {token && <BirthYearForm authorNames={authors.map((a) => a.name)} />}
     </div>
   );
 };

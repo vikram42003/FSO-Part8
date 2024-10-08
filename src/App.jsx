@@ -3,8 +3,20 @@ import { Routes, Route, NavLink, Navigate } from "react-router-dom";
 import Authors from "./views/Authors";
 import Books from "./views/Books";
 import NewBook from "./views/NewBook";
+import Login from "./views/Login";
+import { useEffect, useState } from "react";
+import { useApolloClient } from "@apollo/client";
 
 const App = () => {
+  const [token, setToken] = useState(null);
+  const client = useApolloClient();
+
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      setToken(localStorage.getItem("token"));
+    }
+  }, []);
+
   const navStyle = {
     display: "flex",
     backgroundColor: "lightGray",
@@ -12,6 +24,20 @@ const App = () => {
   };
   const navLinkStyle = {
     padding: "0.75rem 0.5rem",
+  };
+
+  const navButtonStyle = {
+    backgroundColor: "transparent",
+    border: "none",
+    textDecoration: "underline",
+    color: "darkBlue",
+    cursor: "pointer"
+  };
+
+  const handleLogout = () => {
+    setToken(null);
+    localStorage.clear();
+    client.resetStore();
   };
 
   return (
@@ -23,16 +49,29 @@ const App = () => {
         <NavLink style={navLinkStyle} to={"/books"}>
           books
         </NavLink>
-        <NavLink style={navLinkStyle} to={"/add"}>
-          add
-        </NavLink>
+        {token && (
+          <NavLink style={navLinkStyle} to={"/addBook"}>
+            add book
+          </NavLink>
+        )}
+        {!token && (
+          <NavLink style={navLinkStyle} to={"/login"}>
+            login
+          </NavLink>
+        )}
+        {token && (
+          <button onClick={handleLogout} style={navButtonStyle} type="button">
+            log out
+          </button>
+        )}
       </nav>
 
       <Routes>
         <Route path="/" element={<Navigate to="/authors" />} />
-        <Route path="/authors" element={<Authors />} />
+        <Route path="/authors" element={<Authors token={token} />} />
         <Route path="/books" element={<Books />} />
-        <Route path="/add" element={<NewBook />} />
+        <Route path="/addBook" element={<NewBook />} />
+        <Route path="/login" element={<Login setToken={setToken} />} />
       </Routes>
     </div>
   );
