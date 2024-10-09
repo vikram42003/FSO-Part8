@@ -3,9 +3,14 @@ import { useQuery } from "@apollo/client";
 import { getAllBooks } from "../graphql/queries";
 
 const BookTable = ({ genre }) => {
-  const { data, loading, error } = useQuery(getAllBooks, {
-    variables: { genre },
-  });
+  const { data, loading, error } = useQuery(
+    getAllBooks,
+    genre
+      ? {
+          variables: { genre },
+        }
+      : {}
+  );
 
   if (loading) return <div>Loading books data...</div>;
 

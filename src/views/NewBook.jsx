@@ -7,6 +7,28 @@ import { addBook } from "../graphql/mutations";
 const NewBook = () => {
   const [addBookMutation] = useMutation(addBook, {
     refetchQueries: [{ query: getAllBooks }, { query: getAllAuthors }],
+    update: (cache, { data: { addBook } }) => {
+      const newBook = addBook;
+      const newBookGenres = newBook.genres;
+
+      newBookGenres.forEach((genre) => {
+        const oldData = cache.readQuery({
+          query: getAllBooks,
+          variables: { genre },
+        });
+        const oldAllBooks = oldData?.allBooks;
+
+        if (oldAllBooks) {
+          cache.writeQuery({
+            query: getAllBooks,
+            variables: { genre },
+            data: {
+              allBooks: [...oldAllBooks, newBook],
+            },
+          });
+        }
+      });
+    },
   });
 
   const [title, setTitle] = useState("");

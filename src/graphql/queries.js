@@ -28,14 +28,6 @@ export const getAllBooks = gql`
   }
 `;
 
-export const getGenres = gql`
-  query getGenres {
-    allBooks {
-      genres
-    }
-  }
-`;
-
 export const me = gql`
   query Me {
     me {

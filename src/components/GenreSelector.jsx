@@ -1,8 +1,8 @@
 import { useQuery } from "@apollo/client";
-import { getGenres } from "../graphql/queries";
+import { getAllBooks } from "../graphql/queries";
 
 const GenreSelector = ({ genre, setGenre }) => {
-  const { data, loading, error } = useQuery(getGenres);
+  const { data, loading, error } = useQuery(getAllBooks);
 
   if (loading) return <div>loading genres</div>;
   if (error) return <div>An error occured...</div>;
