@@ -13,6 +13,7 @@ const App = () => {
   const client = useApolloClient();
 
   useEffect(() => {
+    // ADD ERROR HANDLING FOR WHEN LOGGING IN FAILS
     if (localStorage.getItem("token")) {
       setToken(localStorage.getItem("token"));
     }

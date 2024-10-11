@@ -1,6 +1,7 @@
-import { useQuery } from "@apollo/client";
+import { useQuery, useSubscription } from "@apollo/client";
 
 import { getAllBooks } from "../graphql/queries";
+import { bookAdded } from "../graphql/subscriptions";
 
 const BookTable = ({ genre }) => {
   const { data, loading, error } = useQuery(
@@ -11,6 +12,38 @@ const BookTable = ({ genre }) => {
         }
       : {}
   );
+
+  useSubscription(bookAdded, {
+    onData: ({ data, client }) => {
+      const newBook = data.data.bookAdded;
+
+      if (newBook) alert(`A new book titled ${newBook.title} by ${newBook.author.name} was added`);
+
+      client.cache.updateQuery({ query: getAllBooks }, (existingData) => {
+        if (existingData && !existingData.allBooks.some((book) => book.title === newBook.title)) {
+          return {
+            allBooks: [...existingData.allBooks, newBook],
+          };
+        }
+        return existingData;
+      });
+
+      newBook.genres.forEach((genre) => {
+        client.cache.updateQuery({ query: getAllBooks, variables: { genre } }, (existingData) => {
+          if (existingData && !existingData.allBooks.some((book) => book.title === newBook.title)) {
+            return {
+              allBooks: [...existingData.allBooks, newBook],
+            };
+          }
+          return existingData;
+        });
+      });
+    },
+
+    onError: (error) => {
+      console.log("Subscription error\n", error);
+    },
+  });
 
   if (loading) return <div>Loading books data...</div>;
 

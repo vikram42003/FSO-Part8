@@ -14,6 +14,7 @@ const Login = ({ setToken }) => {
 
   const handleLogin = (e) => {
     e.preventDefault();
+    localStorage.clear();
     loginMutation({ variables: { username, password } });
     setUsername("");
     setPassword("");
