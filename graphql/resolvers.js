@@ -1,6 +1,9 @@
 import { GraphQLError } from "graphql";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
+import { PubSub } from "graphql-subscriptions";
+
+const pubsub = new PubSub();
 
 import Book from "../models/bookSchema.js";
 import Author from "../models/authorSchema.js";
@@ -23,7 +26,6 @@ const resolvers = {
         }
       }
       if (args.genre) {
-        console.log(args.genre);
         filter.genres = { $all: args.genre };
       }
 
@@ -110,6 +112,8 @@ const resolvers = {
         savedAuthor.books = [...savedAuthor.books, savedBook.id];
         await savedAuthor.save();
 
+        pubsub.publish("BOOK_ADDED", { bookAdded: await savedBook.populate("author") });
+
         return await savedBook.populate("author");
       } catch (error) {
         console.log("Error occured while saving a new book\n\n\n", error);
@@ -166,6 +170,12 @@ const resolvers = {
           }
         }
       }
+    },
+  },
+
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator("BOOK_ADDED"),
     },
   },
 };

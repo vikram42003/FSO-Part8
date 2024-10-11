@@ -11,7 +11,7 @@ const typeDefs = `#graphql
 
   type Book {
     title: String!
-    published: Int!
+    published: Int
     author: Author!
     id: String!
     genres: [String!]!
@@ -48,6 +48,10 @@ const typeDefs = `#graphql
     addBook(title: String!, author: String!, published: Int, genres: [String!]!): Book!
     
     editAuthor(name: String!, setBornTo: Int!): Author
+  }
+
+  type Subscription {
+    bookAdded: Book!
   }
 `;
 
